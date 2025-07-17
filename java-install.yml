@@ -1,0 +1,97 @@
+---
+- name: Install Java on target hosts
+  hosts: all
+  become: yes
+  vars:
+    java_version: "{{ java_version | default('11') }}"
+    java_vendor: "{{ java_vendor | default('openjdk') }}"
+    install_path: "{{ install_path | default('/opt/java') }}"
+    backup_enabled: "{{ backup_enabled | default(true) }}"
+
+  tasks:
+    - name: Create installation directory
+      file:
+        path: "{{ install_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Backup existing Java installation (Linux/AIX)
+      archive:
+        path: "{{ install_path }}"
+        dest: "{{ install_path }}_backup_{{ ansible_date_time.epoch }}.tar.gz"
+      when: backup_enabled and (ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX")
+      ignore_errors: yes
+
+    - name: Backup existing Java installation (Windows)
+      win_shell: |
+        Compress-Archive -Path "{{ install_path }}" -DestinationPath "{{ install_path }}_backup_{{ ansible_date_time.epoch }}.zip"
+      when: backup_enabled and ansible_os_family == "Windows"
+      ignore_errors: yes
+
+    - name: Copy Java installation file to target (Linux/AIX)
+      copy:
+        src: "{{ java_installation_file }}"
+        dest: "/tmp/{{ java_installation_file | basename }}"
+        mode: '0644'
+      when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX"
+
+    - name: Copy Java installation file to target (Windows)
+      win_copy:
+        src: "{{ java_installation_file }}"
+        dest: "C:\\temp\\{{ java_installation_file | basename }}"
+      when: ansible_os_family == "Windows"
+
+    - name: Extract Java installation (Linux/AIX - tar.gz)
+      unarchive:
+        src: "/tmp/{{ java_installation_file | basename }}"
+        dest: "{{ install_path }}"
+        remote_src: yes
+      when: (ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX") and java_installation_file.endswith('.tar.gz')
+
+    - name: Extract Java installation (Windows - zip)
+      win_unzip:
+        src: "C:\\temp\\{{ java_installation_file | basename }}"
+        dest: "{{ install_path }}"
+      when: ansible_os_family == "Windows" and java_installation_file.endswith('.zip')
+
+    - name: Set JAVA_HOME environment variable (Linux/AIX)
+      lineinfile:
+        path: /etc/environment
+        line: "JAVA_HOME={{ install_path }}"
+        create: yes
+      when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX"
+
+    - name: Set JAVA_HOME environment variable (Windows)
+      win_environment:
+        name: JAVA_HOME
+        value: "{{ install_path }}"
+        level: machine
+      when: ansible_os_family == "Windows"
+
+    - name: Update PATH environment variable (Linux/AIX)
+      lineinfile:
+        path: /etc/environment
+        line: "PATH=$PATH:{{ install_path }}/bin"
+        create: yes
+      when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX"
+
+    - name: Create symlink for Java executable (Linux/AIX)
+      file:
+        src: "{{ install_path }}/bin/java"
+        dest: "/usr/bin/java"
+        state: link
+      when: (ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_system == "AIX") and symlink_enabled | default(false)
+
+    - name: Verify Java installation
+      shell: "{{ install_path }}/bin/java -version"
+      register: java_version_output
+      when: ansible_os_family != "Windows"
+
+    - name: Verify Java installation (Windows)
+      win_shell: "{{ install_path }}\\bin\\java.exe -version"
+      register: java_version_output
+      when: ansible_os_family == "Windows"
+
+    - name: Display Java version
+      debug:
+        msg: "{{ java_version_output.stdout }}"

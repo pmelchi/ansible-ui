@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  java-installer:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - java_updater_data:/app/java_updater
+      - ./ansible:/app/ansible
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    restart: unless-stopped
+    networks:
+      - java-installer-network
+
+volumes:
+  java_updater_data:
+    driver: local
+
+networks:
+  java-installer-network:
+    driver: bridge

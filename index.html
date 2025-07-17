@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Installation Wizard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="wizard-container">
+                    <!-- Header -->
+                    <div class="wizard-header">
+                        <h1 class="wizard-title">Java Installation Wizard</h1>
+                        <p class="wizard-subtitle">Deploy Java across multiple platforms with Ansible automation</p>
+                    </div>
+
+                    <!-- Breadcrumbs -->
+                    <nav class="wizard-breadcrumbs">
+                        <div class="breadcrumb-container">
+                            <div class="breadcrumb-item active" data-step="1">
+                                <div class="breadcrumb-icon">1</div>
+                                <span>Installation</span>
+                            </div>
+                            <div class="breadcrumb-item" data-step="2">
+                                <div class="breadcrumb-icon">2</div>
+                                <span>Ansible Config</span>
+                            </div>
+                            <div class="breadcrumb-item" data-step="3">
+                                <div class="breadcrumb-icon">3</div>
+                                <span>Profile</span>
+                            </div>
+                            <div class="breadcrumb-item" data-step="4">
+                                <div class="breadcrumb-icon">4</div>
+                                <span>Execute</span>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <!-- Main Content -->
+                    <div class="wizard-content">
+                        <!-- Step 1: Installation Selection -->
+                        <div class="step-content active" id="step-1">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Select Java Installation</h3>
+                                    <p class="text-muted">Choose an existing installation or upload a new one</p>
+
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="installationSource" id="existingInstall" value="existing">
+                                            <label class="form-check-label" for="existingInstall">
+                                                Use existing installation
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="installationSource" id="uploadInstall" value="upload">
+                                            <label class="form-check-label" for="uploadInstall">
+                                                Upload new installation file
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Existing Installation -->
+                                    <div id="existingInstallSection" class="form-section hidden">
+                                        <div class="form-group">
+                                            <label for="existingInstallSelect" class="form-label">Select Installation</label>
+                                            <select class="form-control" id="existingInstallSelect">
+                                                <option value="">Choose an installation...</option>
+                                            </select>
+                                        </div>
+                                        <div id="missingFileAlert" class="alert alert-warning hidden">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            The selected installation file no longer exists. 
+                                            <button class="btn btn--sm btn--outline" id="deleteConfigBtn">Delete Configuration</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Upload New Installation -->
+                                    <div id="uploadInstallSection" class="form-section hidden">
+                                        <div class="form-group">
+                                            <label for="fileUpload" class="form-label">Upload Installation File</label>
+                                            <div class="upload-area" id="uploadArea">
+                                                <i class="bi bi-cloud-upload"></i>
+                                                <p>Drop files here or click to browse</p>
+                                                <input type="file" id="fileUpload" class="hidden" accept=".tar.gz,.zip,.tar">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="osSelect" class="form-label">Operating System</label>
+                                                    <select class="form-control" id="osSelect">
+                                                        <option value="">Select OS...</option>
+                                                        <option value="linux">Linux</option>
+                                                        <option value="windows">Windows</option>
+                                                        <option value="aix">AIX</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="friendlyName" class="form-label">Friendly Name</label>
+                                                    <input type="text" class="form-control" id="friendlyName" placeholder="e.g., Java 21 Production">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="installCommand" class="form-label">Installation Command</label>
+                                            <input type="text" class="form-control" id="installCommand" placeholder="Installation command">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Ansible Configuration -->
+                        <div class="step-content" id="step-2">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Ansible Configuration</h3>
+                                    <p class="text-muted">Configure connection parameters for your target hosts</p>
+
+                                    <div id="ansibleConfigForm">
+                                        <div class="form-group">
+                                            <label for="inventory" class="form-label">Inventory (Hostnames)</label>
+                                            <textarea class="form-control" id="inventory" rows="3" placeholder="host1.example.com&#10;host2.example.com&#10;host3.example.com"></textarea>
+                                            <small class="form-text text-muted">Enter one hostname per line</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="username" placeholder="Username for SSH/WinRM connection">
+                                        </div>
+
+                                        <!-- Unix/Linux Auth -->
+                                        <div id="unixAuthSection">
+                                            <div class="form-group">
+                                                <label class="form-label">Authentication Method</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="authMethod" id="sshKey" value="key">
+                                                    <label class="form-check-label" for="sshKey">SSH Key</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="authMethod" id="sshPassword" value="password">
+                                                    <label class="form-check-label" for="sshPassword">Password</label>
+                                                </div>
+                                            </div>
+
+                                            <div id="sshKeySection" class="form-section hidden">
+                                                <div class="form-group">
+                                                    <label for="sshKeyFile" class="form-label">SSH Private Key</label>
+                                                    <textarea class="form-control" id="sshKeyFile" rows="4" placeholder="Paste your SSH private key here"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div id="sshPasswordSection" class="form-section hidden">
+                                                <div class="form-group">
+                                                    <label for="sshPasswordInput" class="form-label">Password</label>
+                                                    <input type="password" class="form-control" id="sshPasswordInput" placeholder="SSH password">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Windows Auth -->
+                                        <div id="windowsAuthSection" class="hidden">
+                                            <div class="form-group">
+                                                <label for="winrmPassword" class="form-label">Password</label>
+                                                <input type="password" class="form-control" id="winrmPassword" placeholder="Windows password">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Installation Profile -->
+                        <div class="step-content" id="step-3">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Installation Profile</h3>
+                                    <p class="text-muted">Configure installation paths and backup settings</p>
+
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="profileSource" id="existingProfile" value="existing">
+                                            <label class="form-check-label" for="existingProfile">
+                                                Use existing profile
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="profileSource" id="newProfile" value="new">
+                                            <label class="form-check-label" for="newProfile">
+                                                Create new profile
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Existing Profile -->
+                                    <div id="existingProfileSection" class="form-section hidden">
+                                        <div class="form-group">
+                                            <label for="existingProfileSelect" class="form-label">Select Profile</label>
+                                            <select class="form-control" id="existingProfileSelect">
+                                                <option value="">Choose a profile...</option>
+                                            </select>
+                                        </div>
+                                        <div id="profileDetails" class="profile-details hidden">
+                                            <h6>Current Configuration</h6>
+                                            <div id="profileDetailsContent"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- New Profile -->
+                                    <div id="newProfileSection" class="form-section hidden">
+                                        <div class="form-group">
+                                            <label for="profileName" class="form-label">Profile Name</label>
+                                            <input type="text" class="form-control" id="profileName" placeholder="e.g., Production Linux">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="installPath" class="form-label">Installation Path</label>
+                                            <input type="text" class="form-control" id="installPath" placeholder="Where Java will be installed">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="basePath" class="form-label">Base Path</label>
+                                            <input type="text" class="form-control" id="basePath" placeholder="Base path for unpacking">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="backupEnabled">
+                                                <label class="form-check-label" for="backupEnabled">
+                                                    Create backup of existing installation
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div id="backupSection" class="form-section hidden">
+                                            <div class="form-group">
+                                                <label for="backupPath" class="form-label">Current Installation Path to Backup</label>
+                                                <input type="text" class="form-control" id="backupPath" placeholder="Path to current Java installation">
+                                            </div>
+                                        </div>
+
+                                        <div id="symlinkSection" class="form-section hidden">
+                                            <div class="form-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="symlinkEnabled">
+                                                    <label class="form-check-label" for="symlinkEnabled">
+                                                        Use symlink
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div id="symlinkPathSection" class="form-section hidden">
+                                                <div class="form-group">
+                                                    <label for="symlinkPath" class="form-label">Symlink Path</label>
+                                                    <input type="text" class="form-control" id="symlinkPath" placeholder="Path for symlink">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Installation Execution -->
+                        <div class="step-content" id="step-4">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Installation Summary</h3>
+                                    <p class="text-muted">Review your configuration and start the installation</p>
+
+                                    <div id="installationSummary" class="summary-section">
+                                        <!-- Summary will be populated by JavaScript -->
+                                    </div>
+
+                                    <div id="installationProgress" class="progress-section hidden">
+                                        <h5>Installation Progress</h5>
+                                        <div class="progress">
+                                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%">0%</div>
+                                        </div>
+                                        <div id="currentStep" class="current-step">Ready to start...</div>
+                                        <div id="logOutput" class="log-output">
+                                            <div class="log-header">
+                                                <i class="bi bi-terminal"></i>
+                                                <span>Installation Log</span>
+                                            </div>
+                                            <div id="logContent" class="log-content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="wizard-navigation">
+                        <button class="btn btn--outline" id="prevBtn" disabled>
+                            <i class="bi bi-chevron-left"></i>
+                            Previous
+                        </button>
+                        <button class="btn btn--primary" id="nextBtn">
+                            Next
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <button class="btn btn--primary hidden" id="startBtn">
+                            <i class="bi bi-play-circle"></i>
+                            Start Installation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

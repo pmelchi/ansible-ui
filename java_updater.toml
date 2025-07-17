@@ -1,0 +1,115 @@
+# Java Installation Wizard Configuration
+# This file stores installation packages and profiles
+
+[installation-1]
+friendly_name = "Java 21 Linux (OpenJDK)"
+version = "21.2"
+os = "linux"
+filename = "installation/java21-linux.tar.gz"
+vendor = "openjdk"
+install_command = "tar -xvzf"
+checksum = "sha256:1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f"
+size_mb = 185
+
+[installation-2]
+friendly_name = "Java 21 Windows (OpenJDK)"
+version = "21.2"
+os = "windows"
+filename = "installation/java21-win.zip"
+vendor = "openjdk"
+install_command = "unzip"
+checksum = "sha256:2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3"
+size_mb = 195
+
+[installation-3]
+friendly_name = "Java 8 AIX (IBM J9)"
+version = "8.0.401"
+os = "aix"
+filename = "installation/java8-aix.tar.gz"
+vendor = "ibm"
+install_command = "tar -xvzf"
+checksum = "sha256:3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3g4"
+size_mb = 210
+
+[installation-4]
+friendly_name = "Java 17 Linux (Azul Zulu)"
+version = "17.0.8"
+os = "linux"
+filename = "installation/java17-azul-linux.tar.gz"
+vendor = "azul"
+install_command = "tar -xvzf"
+checksum = "sha256:4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3g4h5"
+size_mb = 175
+
+[installation-5]
+friendly_name = "Java 11 Windows (Oracle JDK)"
+version = "11.0.20"
+os = "windows"
+filename = "installation/java11-oracle-win.zip"
+vendor = "oracle"
+install_command = "unzip"
+checksum = "sha256:5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3g4h5i6"
+size_mb = 165
+
+[profile-1]
+friendly_name = "Development Linux Profile"
+install_path = "/opt/java"
+backup_enabled = true
+backup_path = "/opt/java-backup"
+base_path = "/opt"
+symlink_enabled = true
+symlink_path = "/usr/bin/java"
+environment_vars = ["JAVA_HOME=/opt/java", "PATH=$PATH:/opt/java/bin"]
+os_compatibility = ["linux"]
+
+[profile-2]
+friendly_name = "Production Windows Profile"
+install_path = "C:\Program Files\Java"
+backup_enabled = true
+backup_path = "C:\Java-Backup"
+base_path = "C:\Program Files"
+symlink_enabled = false
+symlink_path = ""
+environment_vars = ["JAVA_HOME=C:\Program Files\Java", "PATH=%PATH%;C:\Program Files\Java\bin"]
+os_compatibility = ["windows"]
+
+[profile-3]
+friendly_name = "AIX Production Profile"
+install_path = "/usr/java"
+backup_enabled = true
+backup_path = "/usr/java-backup"
+base_path = "/usr"
+symlink_enabled = true
+symlink_path = "/usr/bin/java"
+environment_vars = ["JAVA_HOME=/usr/java", "PATH=$PATH:/usr/java/bin"]
+os_compatibility = ["aix"]
+
+[profile-4]
+friendly_name = "Development Multi-Platform"
+install_path = "/opt/java"
+backup_enabled = false
+backup_path = ""
+base_path = "/opt"
+symlink_enabled = true
+symlink_path = "/usr/local/bin/java"
+environment_vars = ["JAVA_HOME=/opt/java", "PATH=$PATH:/opt/java/bin"]
+os_compatibility = ["linux", "aix"]
+
+[profile-5]
+friendly_name = "Testing Windows Profile"
+install_path = "C:\Testing\Java"
+backup_enabled = false
+backup_path = ""
+base_path = "C:\Testing"
+symlink_enabled = false
+symlink_path = ""
+environment_vars = ["JAVA_HOME=C:\Testing\Java", "PATH=%PATH%;C:\Testing\Java\bin"]
+os_compatibility = ["windows"]
+
+# Global settings
+[settings]
+default_timeout = 300
+max_concurrent_installations = 5
+log_level = "INFO"
+enable_notifications = true
+notification_email = "admin@company.com"
